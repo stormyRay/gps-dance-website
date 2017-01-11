@@ -1,1 +1,29 @@
-index.html
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pic Slider - Test Page</title>
+        <style type="text/css">
+            .pic-container{
+                width: 400px;
+                height: 300px;
+                margin: 20px;
+                border: 1px solid #444444;
+                overflow: hidden;
+                position: relative;
+            }
+            .pic{
+                width: 100px;
+                height: 200px;
+                position: absolute;
+            }
+        </style>
+        <script type="text/javascript" src="picSlider.js"></script>
+    </head>
+    <body>
+        <div class="pic-container">
+            <div id="pic1" class="pic pic-1" style="background-color:#00DDDD;"></div>
+            <div id="pic2" class="pic pic-2" style="background-color:#DDDD00;"></div>
+        </div>
+    </body>
+</html>
+
