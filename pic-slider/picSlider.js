@@ -4,17 +4,17 @@
  *  Some pre-defined parameters, which should be defined as options in the app.
  */////////////////////////////////////////////////////////////
 var Interval = 20; //interval of move steps
-var Step = 0.5; // distance of one step at each time
+var Duration = 10; // indicate the duration of the moving, but not an exact time value. The lower it is, the faster the pic moves.
 var Timer = 0;
 
 /*/////////////////////////////////////////////////////////////
  *  function for moving a div
  *  For initial testing only!
  */////////////////////////////////////////////////////////////
-function move(id, distance){
+function move(id, position){
 	Timer++;
 	if(typeof id !== "string" ||
-		typeof distance !== "number"
+		typeof position !== "number"
 		){
 		console.error("Incorrect input type, please check the inputs.")
 	}
@@ -22,15 +22,20 @@ function move(id, distance){
 	var target = document.getElementById(id);
 	if(!target) return;
 	var nowPos = parseFloat(target.style.left ? target.style.left : 0);
-	target.style.left = nowPos + distance * Step / Math.abs(distance) + "px";
+	target.style.left = nowPos + getStep(nowPos, position) + "px";
 
-	if(distance <= 0){
+	if(Math.abs(nowPos - position) < 0.5){
 		Timer = 0;
 	} else {
 		setTimeout(function(){
-			move(id, distance - Step);
+			move(id, position);
 		}, Interval);
 	}
 
 
+}
+
+function getStep(now, target){
+	var step = (target - now) / Duration;
+	return step;
 }
