@@ -7,3 +7,9 @@
 2017-01-14
 * Change the move function input from distance to target position, to adapt the further using situation.
 * Add step calculation, which makes the moving more 'smooth' (Tween moving alike).
+*****************************************************************
+2017-01-15
+* Define wrapper class as "PicSlider".
+* Define method of setting group position of the given HTML.
+* Complete move events (mouseover & mouseout).
+* Add previous and next area without event handler for now.
