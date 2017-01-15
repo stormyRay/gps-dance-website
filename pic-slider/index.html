@@ -3,27 +3,52 @@
     <head>
         <title>Pic Slider - Test Page</title>
         <style type="text/css">
-            .pic-container{
-                width: 400px;
+            .container{
                 height: 300px;
                 margin: 20px;
+            }
+            .container>div{
+                display:inline-block;
+            }
+            .pic-container{
+                width: 640px;
+                height: 100%;
                 border: 1px solid #444444;
-                overflow: hidden;
+                overflow: auto;
                 position: relative;
             }
             .pic{
-                width: 100px;
-                height: 200px;
+                width: 300px;
+                height: 100%;
                 position: absolute;
             }
+            .handling{
+                width: 100px;
+                height: 100%;
+                background: #DDDDDD;
+            }
+            .handling:hover{
+                cursor: pointer;
+            }
         </style>
-        <script type="text/javascript" src="picSlider.js"></script>
     </head>
     <body>
-        <div class="pic-container">
-            <div id="pic1" class="pic pic-1" style="background-color:#00DDDD;"></div>
-            <div id="pic2" class="pic pic-2" style="background-color:#DDDD00;"></div>
+        <div id="container" class="container">
+            <div id="previous" class="handling previous"></div>
+            <div class="pic-container">
+                <div id="pic1" class="pic pic-1" style="background-color:#0044DD;"></div>
+                <div id="pic2" class="pic pic-2" style="background-color:#77DD44;"></div>
+                <div id="pic3" class="pic pic-3" style="background-color:#DD7744;"></div>
+                <div id="pic4" class="pic pic-4" style="background-color:#0077DD;"></div>
+                <div id="pic5" class="pic pic-5" style="background-color:#44DDDD;"></div>
+                <div id="pic6" class="pic pic-6" style="background-color:#DDDD44;"></div>
+                <div id="pic7" class="pic pic-7" style="background-color:#DD4400;"></div>
+                <div id="pic8" class="pic pic-8" style="background-color:#DD44DD;"></div>
+            </div>
+            <div id="previous" class="handling previous"></div>
         </div>
     </body>
+
+    <script type="text/javascript" src="picSlider.js"></script>
 </html>
 
