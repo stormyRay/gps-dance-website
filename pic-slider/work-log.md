@@ -16,3 +16,4 @@
 *****************************************************************
 2017-01-18
 * Minor change on the expansion mode, which makes the slider expandes itself from the center, not only on one side.
+* Add clicking event for each picture/item. User can "expand"/"collpse" each picture by clicking it.
