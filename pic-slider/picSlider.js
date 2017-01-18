@@ -51,7 +51,7 @@ PicSlider.prototype = {
         if(!this.options)
             this.options = {
                 normalWidth: 75,
-                focusRatio: 1.5,
+                focusIncrease: 10,
                 maxWidth: 300,
                 interval: 20,
                 duration: 50
@@ -105,8 +105,13 @@ PicSlider.prototype = {
                 this.move(movingTarget, pos, this.lastUpdate);
 
             var width = this.options.basicWidth;
-            if(index && i == index)
-                width *= this.options.focusRatio;
+            if(index){
+                if(i == index)
+                    width += 2*this.options.focusIncrease;
+                else{
+                    width -= 2* this.options.focusIncrease / (this.picNumber - 1)
+                }
+            }
             pos += width;
         }
     },
