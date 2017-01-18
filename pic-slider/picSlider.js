@@ -44,6 +44,8 @@ PicSlider.prototype = {
         //
 
         this.timer = 0;
+        this.lastUpdate = 0;
+        this.expandedIndex = -1;
         this.setBasicPosition(this.picContainer, this.picList);
     },
     setOptions: function(opt){
@@ -68,6 +70,10 @@ PicSlider.prototype = {
         for(var i = 0; i < list.length; i++){
             list[i].addEvent("mouseover", function(index, e){
                 this.launchMove(index);
+            }.bind(this, i));
+
+            list[i].addEvent("click", function(index, e){
+                this.handleClick(index);
             }.bind(this, i));
         }
 
@@ -96,6 +102,8 @@ PicSlider.prototype = {
 
     },
     launchMove: function(index){
+        if(this.expandedIndex > 0)
+            return;
         this.lastUpdate = 0 + this.timer;
         var pos = 0;// Mark the right side of the previous one
         for(var i = 0; i < this.picNumber; i++){
@@ -107,13 +115,33 @@ PicSlider.prototype = {
             var width = this.options.basicWidth;
             if(index){
                 if(i == index)
-                    width += 2*this.options.focusIncrease;
+                    width += this.options.focusIncrease * (this.picNumber -1);
                 else{
-                    width -= 2* this.options.focusIncrease / (this.picNumber - 1)
+                    width -= this.options.focusIncrease;
                 }
             }
             pos += width;
         }
+    },
+    handleClick: function(index){
+        if(this.expandedIndex > 0){
+            this.expandedIndex = -1;
+            this.launchMove(index);
+            return;
+        }
+        this.lastUpdate = 0 + this.timer;
+        var containerWidth = parseFloat(this.picContainer.clientWidth);
+        for(var i = 0; i < this.picNumber; i++){
+            var movingTarget = this.picList[i];
+            var pos;
+            if(i <= index){
+                pos = 0;
+            } else{
+                pos = containerWidth;
+            }
+            this.move(movingTarget, pos, this.lastUpdate);
+        }
+        this.expandedIndex = index;
     },
     move: function(target, position, time){
         this.timer++;
