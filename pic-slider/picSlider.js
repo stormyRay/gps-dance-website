@@ -33,6 +33,14 @@ Object.prototype.addEvent = function(type, func){
     }
 }
 
+Object.prototype.appendNode = function(tagName, opt){
+    var node = document.createElement(tagName);
+    Object.keys(opt).map(function(prop){
+        node.setAttribute(prop, opt[prop]);
+    });
+    this.appendChild(node);
+}
+
 var PicSlider = Class.create();
 PicSlider.prototype = {
     initialize: function(rootId, options){
@@ -64,6 +72,15 @@ PicSlider.prototype = {
         //Need to add DOM build up logic here!!!
 
         this.picContainer = document.getElementsByClassName("pic-container")[0];
+        this.picContainer.appendNode("div", {
+            id: "previous",
+            class: "handling previous"
+        });
+        this.picContainer.appendNode("div", {
+            id: "next",
+            class: "handling next"
+        });
+        this.picContainer
         this.picList = this.picContainer.children;
         this.picNumber = this.picList.length;
         var list = this.picList
@@ -102,7 +119,7 @@ PicSlider.prototype = {
 
     },
     launchMove: function(index){
-        if(this.expandedIndex > 0)
+        if(this.expandedIndex >= 0)
             return;
         this.lastUpdate = 0 + this.timer;
         var pos = 0;// Mark the right side of the previous one
@@ -113,7 +130,7 @@ PicSlider.prototype = {
                 this.move(movingTarget, pos, this.lastUpdate);
 
             var width = this.options.basicWidth;
-            if(index){
+            if(typeof index ==="number"){
                 if(i == index)
                     width += this.options.focusIncrease * (this.picNumber -1);
                 else{
@@ -124,7 +141,7 @@ PicSlider.prototype = {
         }
     },
     handleClick: function(index){
-        if(this.expandedIndex > 0){
+        if(this.expandedIndex >= 0){
             this.expandedIndex = -1;
             this.launchMove(index);
             return;
