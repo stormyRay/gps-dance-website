@@ -24,8 +24,15 @@
 * Minor change on the expansion mode, which makes the slider expandes itself from the center, not only on one side.
 * Add clicking event for each picture/item. User can "expand"/"collpse" each picture by clicking it.
 
-
 ******************************************************************
 
 2017-01-21
 * Add prototype function for appending DOM, which prepares for the DOM building functon for the whole class.
+
+*****************************************************************
+
+2017-01-25
+* Complete DOM building logic, based on the options (name + image name).
+* Add mouse events for "previous" and "next" button for a scrolling action.
+* **Current shortcome:** All the images are aligned to left, which means in the "collapsed" status, we cannot focus the centeral content. And that is on contrary of the purpose of the slider.
+- Plan to do: change \<img\> into a background-img style and use the background position to control the center of the image. We'll also move the background during our moving.
