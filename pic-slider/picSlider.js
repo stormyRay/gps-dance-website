@@ -31,6 +31,8 @@ Object.prototype.addEvent = function(type, func){
     } else {
         this["on" + type] = func;
     }
+
+    return this;
 }
 
 Object.prototype.appendNode = function(tagName, opt){
@@ -39,21 +41,35 @@ Object.prototype.appendNode = function(tagName, opt){
         node.setAttribute(prop, opt[prop]);
     });
     this.appendChild(node);
+    return node;
+}
+
+var formStyle = function(opts){
+    var str = "";
+    var keys = Object.keys(opts);
+    for(var i = 0; i < keys.length; i ++){
+        str = str + keys[i] + ":" + opts[keys[i]] + ";";
+    }
+
+    return str;
 }
 
 var PicSlider = Class.create();
 PicSlider.prototype = {
     initialize: function(rootId, options){
-        //temporary definition
-        this.setOptions(options);
-        var picOpts = options.pictures;
-        this.container = document.getElementById("rootId");
-        this.buildDOM(container);
-        //
-
+        //Initialize the options
+        this.viewportLeftOffset = 0;
+        this.movingViewport = false;
         this.timer = 0;
         this.lastUpdate = 0;
         this.expandedIndex = -1;
+
+        //temporary definition
+        this.setOptions(options);
+        var picOpts = options.images;
+        this.container = document.getElementById("rootId");
+        this.buildDOM(container);
+        //
         this.setBasicPosition(this.picContainer, this.picList);
     },
     setOptions: function(opt){
@@ -64,35 +80,83 @@ PicSlider.prototype = {
                 focusIncrease: 10,
                 maxWidth: 300,
                 interval: 20,
-                duration: 50
+                duration: 20
             };
         this.options.merge(opt || {});
     },
     buildDOM: function(container){
         //Need to add DOM build up logic here!!!
 
-        this.picContainer = document.getElementsByClassName("pic-container")[0];
-        this.picContainer.appendNode("div", {
+        container.appendNode("div", {
             id: "previous",
             class: "handling previous"
+        }).addEvent("mousedown", function(e){
+                this.movingViewport = true;
+                this.moveViewport("previous");
+            }.bind(this))
+        .addEvent("mouseup", function(e){
+                this.movingViewport = false;
+            }.bind(this))
+        .addEvent("mouseleave", function(e){
+                this.movingViewport = false;
+            }.bind(this));
+        this.viewport = container.appendNode("div", {
+            id: "pic_slider_viewport",
+            class: "slider-viewport"
         });
-        this.picContainer.appendNode("div", {
+
+        container.appendNode("div", {
             id: "next",
             class: "handling next"
-        });
-        this.picContainer
-        this.picList = this.picContainer.children;
-        this.picNumber = this.picList.length;
-        var list = this.picList
-        for(var i = 0; i < list.length; i++){
-            list[i].addEvent("mouseover", function(index, e){
-                this.launchMove(index);
-            }.bind(this, i));
+        }).addEvent("mousedown", function(button, e){
+                this.movingViewport = true;
+                this.moveViewport("next");
+            }.bind(this))
+        .addEvent("mouseup", function(e){
+                this.movingViewport = false;
+            }.bind(this))
+        .addEvent("mouseleave", function(e){
+                this.movingViewport = false;
+            }.bind(this));
 
-            list[i].addEvent("click", function(index, e){
+        this.picContainer = this.viewport.appendNode("div",{
+            id: "pic_slider_container",
+            class: "pic-container"
+        })
+
+        var images = this.options.images;
+        this.picNumber = images.length;
+        for(var i = 0; i < images.length; i ++){
+            var picWrapper = this.picContainer.appendNode("div", {
+                id: "pic_wrapper_" + images[i].name,
+                class: "pic"
+            });
+
+            var offset = (this.options.normalWidth / 2 - images[i].center)
+            picWrapper.appendNode("img", {
+                id: "pic_" + images[i].name,
+                src: "img/"+images[i].img
+            });
+
+            picWrapper.addEvent("mouseover", function(index, e){
+                this.launchMove(index);
+            }.bind(this, i))
+            .addEvent("click", function(index, e){
                 this.handleClick(index);
             }.bind(this, i));
         }
+
+        this.picList = this.picContainer.children;
+        // var list = this.picList
+        // for(var i = 0; i < list.length; i++){
+        //     list[i].addEvent("mouseover", function(index, e){
+        //         this.launchMove(index);
+        //     }.bind(this, i));
+
+        //     list[i].addEvent("click", function(index, e){
+        //         this.handleClick(index);
+        //     }.bind(this, i));
+        // }
 
         this.picContainer.addEvent("mouseout", function(e){
             this.launchMove()
@@ -152,9 +216,9 @@ PicSlider.prototype = {
             var movingTarget = this.picList[i];
             var pos;
             if(i <= index){
-                pos = 0;
+                pos = -1* this.viewportLeftOffset;
             } else{
-                pos = containerWidth;
+                pos = -1* this.viewportLeftOffset + containerWidth;
             }
             this.move(movingTarget, pos, this.lastUpdate);
         }
@@ -169,6 +233,8 @@ PicSlider.prototype = {
         var nowPos = parseFloat(target.style.left ? target.style.left : 0);
         target.style.left = nowPos + this.getStep(nowPos, position) + "px";
 
+        var imgTarget = target.childNodes[0];
+
         if(Math.abs(nowPos - position) < 0.5){
             this.timer = 0;
         } else {
@@ -180,7 +246,24 @@ PicSlider.prototype = {
     getStep: function(now, target){
         var step = (target - now) / this.options.duration;
         return step;
+    },
+    moveViewport: function(button) {
+        if(!this.movingViewport)
+            return;
+        if((this.viewportLeftOffset >= 0 && button == "previous")||
+            (this.viewportLeftOffset <= -1 * this.picNumber * this.options.normalWidth + this.viewport.clientWidth && button == "next"))
+            return;
+        setTimeout(function(){
+            if(button == "previous"){
+                var offset = 5;
+            } else if (button == "next"){
+                var offset = -5;
+            }
+            this.viewportLeftOffset += offset;
+            this.picContainer.style.left = this.viewportLeftOffset + "px";
+            this.moveViewport(button);
+        }.bind(this), this.options.interval);
     }
 }
 
-var slider = new PicSlider("container", {});
+var slider = new PicSlider("container", imagesOption);
