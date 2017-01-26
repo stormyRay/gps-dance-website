@@ -34,5 +34,12 @@
 2017-01-25
 * Complete DOM building logic, based on the options (name + image name).
 * Add mouse events for "previous" and "next" button for a scrolling action.
-* **Current shortcome:** All the images are aligned to left, which means in the "collapsed" status, we cannot focus the centeral content. And that is on contrary of the purpose of the slider.
-- Plan to do: change \<img\> into a background-img style and use the background position to control the center of the image. We'll also move the background during our moving.
+* ~~**Current shortcome:** All the images are aligned to left, which means in the "collapsed" status, we cannot focus the centeral content. And that is on contrary of the purpose of the slider.~~
+- ~~Plan to do: change \<img\> into a background-img style and use the background position to control the center of the image. We'll also move the background during our moving.~~
+
+******************************************************************
+
+2017-01-26
+* Change moving mechanism from multiple single moving chain (multi-thread alike), to one moving chain (one thread alike). Before, we have multiple items moves at the same time (multiple setTimeInterval actions). Now we make all targets moving in one setInterval action. That will definitely reduce the system resource comsumption and weaken the "flash" during moving.
+* Add "center" attribute for each image, which makes the expanding is more like from center expanded.
+* Other minor changes: style adding for central expanding, avoid viewport moving after one item expanded.

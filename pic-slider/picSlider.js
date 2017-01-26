@@ -295,7 +295,7 @@ PicSlider.prototype = {
         return step;
     },
     moveViewport: function(button) {
-        if(!this.movingViewport)
+        if(!this.movingViewport || this.expandedIndex >= 0)
             return;
         if((this.viewportLeftOffset >= 0 && button == "previous")||
             (this.viewportLeftOffset <= -1 * this.picNumber * this.options.normalWidth + this.viewport.clientWidth && button == "next"))
