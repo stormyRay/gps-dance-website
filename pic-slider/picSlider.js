@@ -63,6 +63,8 @@ PicSlider.prototype = {
         this.timer = 0;
         this.lastUpdate = 0;
         this.expandedIndex = -1;
+        this.positions = {};
+        this.basicOffsets = {};
 
         //temporary definition
         this.setOptions(options);
@@ -132,11 +134,17 @@ PicSlider.prototype = {
                 class: "pic"
             });
 
-            var offset = (this.options.normalWidth / 2 - images[i].center)
-            picWrapper.appendNode("img", {
+            var offset = (this.options.normalWidth / 2 - images[i].center);
+            var image = picWrapper.appendNode("img", {
                 id: "pic_" + images[i].name,
-                src: "img/"+images[i].img
+                src: "img/"+images[i].img,
+                style: formStyle({
+                    left: offset +"px"
+                })
             });
+
+            this.positions[image.id] = offset;
+            this.basicOffsets[image.id] = offset;
 
             picWrapper.addEvent("mouseover", function(index, e){
                 this.launchMove(index);
@@ -178,6 +186,7 @@ PicSlider.prototype = {
         var leftPosition = 0, itemWidth = 0;
         for(var i = 0; i < children.length; i++){
             children[i].style.left = leftPosition+ "px";
+            this.positions[children[i].id] = leftPosition;
             leftPosition += width;
         }
 
@@ -191,7 +200,8 @@ PicSlider.prototype = {
             var movingTarget = this.picList[i];
             var now = parseFloat(movingTarget.style.left ? movingTarget.style.left : 0);
             if(now != pos)
-                this.move(movingTarget, pos, this.lastUpdate);
+                this.positions[movingTarget.id] = pos;
+                //this.move(movingTarget, pos, this.lastUpdate);
 
             var width = this.options.basicWidth;
             if(typeof index ==="number"){
@@ -201,8 +211,12 @@ PicSlider.prototype = {
                     width -= this.options.focusIncrease;
                 }
             }
+            var imageTarget = movingTarget.childNodes[0];
+            this.positions[imageTarget.id] = (width / 2 - this.options.images[i].center)
             pos += width;
         }
+
+        this.moveGroup(this.positions, this.lastUpdate);
     },
     handleClick: function(index){
         if(this.expandedIndex >= 0){
@@ -215,13 +229,19 @@ PicSlider.prototype = {
         for(var i = 0; i < this.picNumber; i++){
             var movingTarget = this.picList[i];
             var pos;
-            if(i <= index){
-                pos = -1* this.viewportLeftOffset;
+            if(i < index){
+                pos = -1 * this.viewportLeftOffset;
+            } else if (i == index){
+                pos = -1 * this.viewportLeftOffset;
+                var imageTargetId = movingTarget.childNodes[0].id;
+                this.positions[imageTargetId] = 0;
             } else{
-                pos = -1* this.viewportLeftOffset + containerWidth;
+                pos = -1 * this.viewportLeftOffset + containerWidth;
             }
-            this.move(movingTarget, pos, this.lastUpdate);
+            this.positions[movingTarget.id] = pos;
+            //this.move(movingTarget, pos, this.lastUpdate);
         }
+        this.moveGroup(this.positions, this.lastUpdate);
         this.expandedIndex = index;
     },
     move: function(target, position, time){
@@ -240,6 +260,33 @@ PicSlider.prototype = {
         } else {
             setTimeout(function(){
                 this.move(target, position, time);
+            }.bind(this), this.interval);
+        }
+    },
+    moveGroup: function(positions, time){
+        this.timer++;
+        if(time != this.lastUpdate){
+            return;
+        }
+
+        var targets = Object.keys(positions);
+        var offset = 0; // signal of all the components are in good position
+        for(var i = 0; i < targets.length; i++){
+            var targetId =  targets[i];
+            var target = document.getElementById(targetId);
+            var position = positions[targetId];
+            var nowPos = parseFloat(target.style.left ? target.style.left : 0);
+            target.style.left = nowPos + this.getStep(nowPos, position) + "px";
+
+            var distance = Math.abs(nowPos - position)
+            offset = Math.max(offset, distance);
+        }
+
+        if(offset < 0.5){
+                this.timer = 0;
+        } else {
+            setTimeout(function(){
+                this.moveGroup(positions, time);
             }.bind(this), this.interval);
         }
     },
