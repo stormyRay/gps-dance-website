@@ -43,3 +43,11 @@
 * Change moving mechanism from multiple single moving chain (multi-thread alike), to one moving chain (one thread alike). Before, we have multiple items moves at the same time (multiple setTimeInterval actions). Now we make all targets moving in one setInterval action. That will definitely reduce the system resource comsumption and weaken the "flash" during moving.
 * Add "center" attribute for each image, which makes the expanding is more like from center expanded.
 * Other minor changes: style adding for central expanding, avoid viewport moving after one item expanded.
+
+*******************************************************************
+
+2017-01-27
+* Improve the DOM structure. Add picture information/introduction to the system.
+* Make event adding more easy. (make the event adding as an attribute of the DOM building).
+
+*******************************************************************

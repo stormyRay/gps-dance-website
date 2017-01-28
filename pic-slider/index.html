@@ -20,22 +20,38 @@
                 position: relative;
                 height: 100%;
             }
-            .pic{
+            .pic-wrapper{
                 width: 700px;
                 height: 100%;
                 position: absolute;
                 cursor: pointer;
                 overflow: hidden;
             }
-            .pic>img{
+            .pic-intro{
+                width: 400px;
+                height: 100%;
+                position: absolute;
+                background-color: rgba(80,80,80, 0.75);
+            }
+            .image{
                 position: relative;
             }
             .handling{
-                width: 100px;
-                height: 100%;
-                background: #DDDDDD;
+                width: 60px;
+                height: 60px;
+                position: absolute;
+                top: 50%;
+                margin-top: -30px;
+                background-color: rgba(200,200,200,0.7);
+            }
+            .next{
+                right: 20px;
+            }
+            .previous{
+                left: 20px;
             }
             .handling:hover{
+                background-color: rgba(200,200,200,1);
                 cursor: pointer;
             }
         </style>

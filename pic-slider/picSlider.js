@@ -38,10 +38,37 @@ Object.prototype.addEvent = function(type, func){
 Object.prototype.appendNode = function(tagName, opt){
     var node = document.createElement(tagName);
     Object.keys(opt).map(function(prop){
+        if(typeof opt[prop] == "function"){
+            node.addEvent(prop, opt[prop]);
+        } else{
         node.setAttribute(prop, opt[prop]);
+        }
     });
     this.appendChild(node);
     return node;
+}
+
+Object.prototype.childNodesOfClass = function(className){
+    var children = this.childNodes;
+    var results = [];
+    for(var i = 0; i < children.length; i++){
+        if(!children[i].classList){
+            var classList = children[i].className.split(" ");
+            for(var k = 0; k < classList.length; k++){
+                if(classList[k] == className){
+                    results.push(children[i]);
+                    break;
+                }
+            }
+        } else{
+            if(children[i].classList.contains(className))
+                results.push(children[i]);
+        }
+    }
+    if(results.length == 1)
+        return results[0]
+    else
+        return results;
 }
 
 var formStyle = function(opts){
@@ -50,7 +77,6 @@ var formStyle = function(opts){
     for(var i = 0; i < keys.length; i ++){
         str = str + keys[i] + ":" + opts[keys[i]] + ";";
     }
-
     return str;
 }
 
@@ -89,41 +115,24 @@ PicSlider.prototype = {
     buildDOM: function(container){
         //Need to add DOM build up logic here!!!
 
-        container.appendNode("div", {
-            id: "previous",
-            class: "handling previous"
-        }).addEvent("mousedown", function(e){
-                this.movingViewport = true;
-                this.moveViewport("previous");
-            }.bind(this))
-        .addEvent("mouseup", function(e){
-                this.movingViewport = false;
-            }.bind(this))
-        .addEvent("mouseleave", function(e){
-                this.movingViewport = false;
-            }.bind(this));
+        
         this.viewport = container.appendNode("div", {
             id: "pic_slider_viewport",
             class: "slider-viewport"
         });
 
-        container.appendNode("div", {
-            id: "next",
-            class: "handling next"
-        }).addEvent("mousedown", function(button, e){
-                this.movingViewport = true;
-                this.moveViewport("next");
-            }.bind(this))
-        .addEvent("mouseup", function(e){
-                this.movingViewport = false;
-            }.bind(this))
-        .addEvent("mouseleave", function(e){
-                this.movingViewport = false;
-            }.bind(this));
 
         this.picContainer = this.viewport.appendNode("div",{
             id: "pic_slider_container",
-            class: "pic-container"
+            class: "pic-container",
+            mouseover: function(e) { 
+                if(this.expandedIndex < 0)
+                    this.showHideHandlers(true);
+            }.bind(this),
+            mouseout: function(e){
+                this.showHideHandlers(false);
+                this.launchMove();
+            }.bind(this)
         })
 
         var images = this.options.images;
@@ -131,12 +140,19 @@ PicSlider.prototype = {
         for(var i = 0; i < images.length; i ++){
             var picWrapper = this.picContainer.appendNode("div", {
                 id: "pic_wrapper_" + images[i].name,
-                class: "pic"
+                class: "pic-wrapper",
+                mouseover: function(index, e){
+                    this.launchMove(index);
+                }.bind(this, i),
+                click: function(index, e){
+                    this.handleClick(index);
+                }.bind(this, i)
             });
 
             var offset = (this.options.normalWidth / 2 - images[i].center);
             var image = picWrapper.appendNode("img", {
                 id: "pic_" + images[i].name,
+                class: "image",
                 src: "img/"+images[i].img,
                 style: formStyle({
                     left: offset +"px"
@@ -145,16 +161,9 @@ PicSlider.prototype = {
 
             this.positions[image.id] = offset;
             this.basicOffsets[image.id] = offset;
-
-            picWrapper.addEvent("mouseover", function(index, e){
-                this.launchMove(index);
-            }.bind(this, i))
-            .addEvent("click", function(index, e){
-                this.handleClick(index);
-            }.bind(this, i));
         }
 
-        this.picList = this.picContainer.children;
+        this.picList = this.picContainer.childNodesOfClass("pic-wrapper");
         // var list = this.picList
         // for(var i = 0; i < list.length; i++){
         //     list[i].addEvent("mouseover", function(index, e){
@@ -166,9 +175,41 @@ PicSlider.prototype = {
         //     }.bind(this, i));
         // }
 
-        this.picContainer.addEvent("mouseout", function(e){
-            this.launchMove()
-        }.bind(this));
+
+        this.picIntro = this.picContainer.appendNode("div", {
+            id: "pic_information",
+            class: "pic-intro"
+        });
+        this.previousHandler = this.picContainer.appendNode("div", {
+            id: "previous",
+            class: "handling previous",
+            mousedown: function(e){
+                this.movingViewport = true;
+                this.moveViewport("previous");
+            }.bind(this),
+            mouseup: function(e){
+                this.movingViewport = false;
+            }.bind(this),
+            mouseleave: function(e){
+                this.movingViewport = false;
+            }.bind(this)
+        });
+
+
+        this.nextHandler = this.picContainer.appendNode("div", {
+            id: "next",
+            class: "handling next",
+            mousedown:  function(button, e){
+                this.movingViewport = true;
+                this.moveViewport("next");
+            }.bind(this),
+            mouseup: function(e){
+                this.movingViewport = false;
+            }.bind(this),
+            mouseleave:  function(e){
+                this.movingViewport = false;
+            }.bind(this)
+        });
 
         return container;
     },
@@ -190,6 +231,7 @@ PicSlider.prototype = {
             leftPosition += width;
         }
 
+        this.picIntro.style.left = this.picNumber * this.options.normalWidth + "px";
     },
     launchMove: function(index){
         if(this.expandedIndex >= 0)
@@ -211,17 +253,22 @@ PicSlider.prototype = {
                     width -= this.options.focusIncrease;
                 }
             }
-            var imageTarget = movingTarget.childNodes[0];
+            var imageTarget = movingTarget.childNodesOfClass("image");
             this.positions[imageTarget.id] = (width / 2 - this.options.images[i].center)
             pos += width;
         }
+        this.positions["pic_information"] = this.picNumber * this.options.normalWidth;
 
         this.moveGroup(this.positions, this.lastUpdate);
     },
+    collapse: function(index) {
+        this.expandedIndex = -1;
+        this.launchMove(index);
+        this.showHideHandlers(true);
+    },
     handleClick: function(index){
         if(this.expandedIndex >= 0){
-            this.expandedIndex = -1;
-            this.launchMove(index);
+            this.collapse(index);
             return;
         }
         this.lastUpdate = 0 + this.timer;
@@ -233,7 +280,7 @@ PicSlider.prototype = {
                 pos = -1 * this.viewportLeftOffset;
             } else if (i == index){
                 pos = -1 * this.viewportLeftOffset;
-                var imageTargetId = movingTarget.childNodes[0].id;
+                var imageTargetId = movingTarget.childNodesOfClass("image").id;
                 this.positions[imageTargetId] = 0;
             } else{
                 pos = -1 * this.viewportLeftOffset + containerWidth;
@@ -241,8 +288,10 @@ PicSlider.prototype = {
             this.positions[movingTarget.id] = pos;
             //this.move(movingTarget, pos, this.lastUpdate);
         }
+        this.positions["pic_information"] = -1 * this.viewportLeftOffset + containerWidth - this.picIntro.clientWidth;
         this.moveGroup(this.positions, this.lastUpdate);
         this.expandedIndex = index;
+        this.showHideHandlers(false);
     },
     move: function(target, position, time){
         this.timer++;
@@ -253,7 +302,7 @@ PicSlider.prototype = {
         var nowPos = parseFloat(target.style.left ? target.style.left : 0);
         target.style.left = nowPos + this.getStep(nowPos, position) + "px";
 
-        var imgTarget = target.childNodes[0];
+        var imgTarget = target.childNodesOfClass("image");
 
         if(Math.abs(nowPos - position) < 0.5){
             this.timer = 0;
@@ -295,6 +344,8 @@ PicSlider.prototype = {
         return step;
     },
     moveViewport: function(button) {
+            this.nextHandler.style.right = 20 + this.viewportLeftOffset + "px";
+            this.previousHandler.style.left = 20 - this.viewportLeftOffset + "px";
         if(!this.movingViewport || this.expandedIndex >= 0)
             return;
         if((this.viewportLeftOffset >= 0 && button == "previous")||
@@ -310,6 +361,10 @@ PicSlider.prototype = {
             this.picContainer.style.left = this.viewportLeftOffset + "px";
             this.moveViewport(button);
         }.bind(this), this.options.interval);
+    },
+    showHideHandlers: function(show){
+        this.nextHandler.style.display = show ? "block" : "none";
+        this.previousHandler.style.display =  show ? "block" : "none";
     }
 }
 
