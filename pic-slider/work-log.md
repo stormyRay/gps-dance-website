@@ -51,3 +51,8 @@
 * Make event adding more easy. (make the event adding as an attribute of the DOM building).
 
 *******************************************************************
+
+2017-01-28
+* Add picture introduction block animation.
+* Change previous/next (scrolling) handler position from outside to inside. And make them hide/show according to mouse position.
+* Improve details on minor features to complete the basic widget's functionality.
