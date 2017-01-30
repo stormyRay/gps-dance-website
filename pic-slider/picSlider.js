@@ -164,17 +164,6 @@ PicSlider.prototype = {
         }
 
         this.picList = this.picContainer.childNodesOfClass("pic-wrapper");
-        // var list = this.picList
-        // for(var i = 0; i < list.length; i++){
-        //     list[i].addEvent("mouseover", function(index, e){
-        //         this.launchMove(index);
-        //     }.bind(this, i));
-
-        //     list[i].addEvent("click", function(index, e){
-        //         this.handleClick(index);
-        //     }.bind(this, i));
-        // }
-
 
         this.picIntro = this.picContainer.appendNode("div", {
             id: "pic_information",
