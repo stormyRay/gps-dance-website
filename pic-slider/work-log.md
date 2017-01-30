@@ -56,3 +56,14 @@
 * Add picture introduction block animation.
 * Change previous/next (scrolling) handler position from outside to inside. And make them hide/show according to mouse position.
 * Improve details on minor features to complete the basic widget's functionality.
+
+********************************************************************
+
+2017-01-30
+* Apply react+reduc+react-router, build up basic structure for the website.
+* Success on a simple router helloworld (supported by Node server)
+* Need to do:
+> Expand the routers
+> Create whole website react/redux structure
+> server rendering
+> webpack
