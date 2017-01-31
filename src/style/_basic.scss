@@ -1,0 +1,45 @@
+body {
+	margin: 0;
+	background-color: #EFEFEF;
+}
+
+.gps-logo{
+	width: 120px;
+	height: 60px;
+	background-color: #3E3A39;
+	margin: 80px auto 50px auto;
+}
+
+.nav-bar{
+	width: 80%;
+	margin: 0 auto;
+	display: table;
+	border-top: 1px solid #3E3A39;
+	padding: 10px 0;
+
+	li{
+		display: table-cell;
+		width: 16.6%;
+		text-align: center;
+
+		a{
+			color: #3E3A39;
+			font-size: 14px;
+			font-family: Arial;
+			text-decoration: none;
+
+			&:hover,
+			&.active{
+				font-weight: 600;
+				font-size: 16px;
+			}
+		}
+	}
+}
+
+.content-wrapper{
+	width: 80%;
+	margin: 0 auto;
+	height: 500px;
+	border: 1px dashed #999999;
+}

@@ -1,4 +1,5 @@
 import React from "react";
+import NavBar from "./NavBar";
 
 class App extends React.Component{
 	constructor(props) {
@@ -7,7 +8,13 @@ class App extends React.Component{
 
 	render() {
 		return (
-			<div>Home</div>
+			<div className="root-wrapper">
+				<div className="gps-logo">LOGO PLACEHOLDER</div>
+				<NavBar />
+				<div className="content-wrapper">
+					{this.props.children}
+				</div>
+			</div>
 		)
 	}
 }

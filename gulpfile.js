@@ -3,7 +3,7 @@ var uglify = require('gulp-uglify');
 var htmlreplace = require('gulp-html-replace');
 var source = require('vinyl-source-stream');
 var browserify = require('browserify');
-//var sass = require('gulp-sass');
+var sass = require('gulp-sass');
 var replace = require('gulp-replace');
 var watchify = require('watchify');
 var babelify = require('babelify');
@@ -18,7 +18,7 @@ var path = {
     DEST_BUILD: 'dist/build',
     DEST_SRC: 'dist/build',
     JS_ENTRY_POINT: './src/index.js',
-    SCSS_ENTRY_POINT: './src/style/new-style/pages/index.scss',
+    SCSS_ENTRY_POINT: './src/style/index.scss',
     CSS_OUT: 'index.css',
     RESOURCES_SRC: ['src/resources/**/*'],
     RESOURCES_DEST: 'dist/resources'
@@ -134,5 +134,5 @@ return watcher.on('update', function () {
  * gulp task binding
  */////////////////////////////////////////////////////////////////////////////////
 gulp.task('default', ['debug']);
-gulp.task('production', ['copyResources', 'replaceHTML', 'build']);
-gulp.task('debug', ['copyResources', 'replaceHTML-debug', 'build-debug']);
+gulp.task('production', ['copyResources', 'replaceHTML', 'sass', 'build']);
+gulp.task('debug', ['copyResources', 'replaceHTML-debug', 'sass', 'build-debug']);
