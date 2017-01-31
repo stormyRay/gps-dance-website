@@ -1,0 +1,58 @@
+[{
+	"name": "01",
+	"img": "001.jpg",
+	"center": 150,
+	"information": {
+		"name": "001",
+		"danceType": "Popping"
+	}
+}, {
+	"name": "02",
+	"img": "002.jpg",
+	"center": 150,
+	"information": {
+		"name": "002",
+		"danceType": "Locking"
+	}
+}, {
+	"name": "03",
+	"img": "003.jpg",
+	"center": 150,
+	"information": {
+		"name": "003",
+		"danceType": "Jazz Waacking"
+	}
+}, {
+	"name": "04",
+	"img": "004.jpg",
+	"center": 150,
+	"information": {
+		"name": "004",
+		"danceType": "Locking BOSS"
+	}
+}, {
+	"name": "05",
+	"img": "005.jpg",
+	"center": 150,
+	"information": {
+		"name": "005",
+		"danceType": "Hiphop"
+	}
+}, {
+	"name": "06",
+	"img": "006.jpg",
+	"center": 150,
+	"information": {
+		"name": "006",
+		"danceType": "Jazz Waacking"
+	}
+}, {
+	"name": "07",
+	"img": "007.jpg",
+	"center": 150,
+	"information": {
+		"name": "007",
+		"danceType": "Locking"
+	}
+}
+]

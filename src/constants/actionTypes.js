@@ -1,1 +1,2 @@
 export const SELECT_TAG = "SELECT_TAG";
+export const UPDATE_DANCERS = "UPDATE_DANCERS";
