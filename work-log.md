@@ -67,3 +67,12 @@
 > Create whole website react/redux structure
 > server rendering
 > webpack
+
+********************************************************************
+
+2017-01-31
+* Complete basic routers.
+* Complete whole website react/redux structure.
+* Set up simple node server for several necessary web services.
+* Apply basic style to the page.
+* **First Milestone for G.P.S. web site building**
