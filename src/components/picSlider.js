@@ -15,41 +15,41 @@ var Class = {
     }
 }
 
-Object.prototype.merge = function(source){
+var merge = function(target, source){
     for(var property in source){
-        this[property] = source[property];
+        target[property] = source[property];
     }
 
-    return this;
+    return target;
 }
 
-Object.prototype.addEvent = function(type, func){
-    if (this.addEventListener) {
-        this.addEventListener(type, func, false);
-    } else if (this.attachEvent) {
-        this.attachEvent("on" + type, func);
+var addEvent = function(target, type, func){
+    if (target.addEventListener) {
+        target.addEventListener(type, func, false);
+    } else if (target.attachEvent) {
+        target.attachEvent("on" + type, func);
     } else {
-        this["on" + type] = func;
+        target["on" + type] = func;
     }
 
-    return this;
+    return target;
 }
 
-Object.prototype.appendNode = function(tagName, opt){
+var appendNode = function(target, tagName, opt){
     var node = document.createElement(tagName);
     Object.keys(opt).map(function(prop){
         if(typeof opt[prop] == "function"){
-            node.addEvent(prop, opt[prop]);
+            addEvent(node, prop, opt[prop]);
         } else{
         node.setAttribute(prop, opt[prop]);
         }
     });
-    this.appendChild(node);
+    target.appendChild(node);
     return node;
 }
 
-Object.prototype.childNodesOfClass = function(className){
-    var children = this.childNodes;
+var childNodesOfClass = function(target, className){
+    var children = target.childNodes;
     var results = [];
     for(var i = 0; i < children.length; i++){
         if(!children[i].classList){
@@ -100,7 +100,7 @@ PicSlider.prototype = {
         this.buildDOM(this.container);
         //
         this.setBasicPosition(this.picContainer, this.picList);
-        window.addEvent("resize", function(){
+        addEvent(window, "resize", function(){
         	this.setBasicPosition(this.picContainer, this.picList);
         }.bind(this));
     },
@@ -116,17 +116,17 @@ PicSlider.prototype = {
                 srcPath: "img/",
                 introAttr: "information"
             };
-        this.options.merge(opt || {});
+        merge(this.options, opt || {});
     },
     buildDOM: function(container){
         //Need to add DOM build up logic here!!!
-        this.viewport = container.appendNode("div", {
+        this.viewport = appendNode(container, "div", {
             id: "pic_slider_viewport",
             class: "slider-viewport"
         });
 
 
-        this.picContainer = this.viewport.appendNode("div",{
+        this.picContainer = appendNode(this.viewport, "div",{
             id: "pic_slider_container",
             class: "pic-container",
             mouseover: function(e) { 
@@ -142,7 +142,7 @@ PicSlider.prototype = {
         var images = this.options.images;
         this.picNumber = images.length;
         for(var i = 0; i < images.length; i ++){
-            var picWrapper = this.picContainer.appendNode("div", {
+            var picWrapper = appendNode(this.picContainer, "div", {
                 id: "pic_wrapper_" + images[i].name,
                 class: "pic-wrapper",
                 mouseover: function(index, e){
@@ -154,7 +154,7 @@ PicSlider.prototype = {
             });
 
             var offset = (this.options.normalWidth / 2 - images[i].center);
-            var image = picWrapper.appendNode("img", {
+            var image = appendNode(picWrapper, "img", {
                 id: "pic_" + images[i].name,
                 class: "image",
                 src: this.options.srcPath + images[i].img,
@@ -167,13 +167,13 @@ PicSlider.prototype = {
             this.basicOffsets[image.id] = offset;
         }
 
-        this.picList = this.picContainer.childNodesOfClass("pic-wrapper");
+        this.picList = childNodesOfClass(this.picContainer, "pic-wrapper");
 
-        this.picIntro = this.picContainer.appendNode("div", {
+        this.picIntro = appendNode(this.picContainer, "div", {
             id: "pic_information",
             class: "pic-intro"
         });
-        this.previousHandler = this.picContainer.appendNode("div", {
+        this.previousHandler = appendNode(this.picContainer, "div", {
             id: "previous",
             class: "handling previous",
             mousedown: function(e){
@@ -189,7 +189,7 @@ PicSlider.prototype = {
         });
 
 
-        this.nextHandler = this.picContainer.appendNode("div", {
+        this.nextHandler = appendNode(this.picContainer, "div", {
             id: "next",
             class: "handling next",
             mousedown:  function(button, e){
@@ -225,7 +225,7 @@ PicSlider.prototype = {
             children[i].style.left = leftPosition+ "px";
             this.positions[children[i].id] = leftPosition;
             leftPosition += width;
-            var imageTarget = children[i].childNodesOfClass("image");
+            var imageTarget = childNodesOfClass(children[i], "image");
             var imageLeft = (width / 2 - this.options.images[i].center);
             imageTarget.style.left = imageLeft+ "px";
             this.positions[imageTarget.id] = imageLeft;
@@ -271,7 +271,7 @@ PicSlider.prototype = {
                     width -= this.options.focusIncrease;
                 }
             }
-            var imageTarget = movingTarget.childNodesOfClass("image");
+            var imageTarget = childNodesOfClass(movingTarget, "image");
             this.positions[imageTarget.id] = (width / 2 - this.options.images[i].center)
             pos += width;
         }
@@ -298,7 +298,7 @@ PicSlider.prototype = {
                 pos = -1 * this.viewportLeftOffset;
             } else if (i == index){
                 pos = -1 * this.viewportLeftOffset;
-                var imageTargetId = movingTarget.childNodesOfClass("image").id;
+                var imageTargetId = childNodesOfClass(movingTarget, "image").id;
                 this.positions[imageTargetId] = 0;
             } else{
                 pos = -1 * this.viewportLeftOffset + containerWidth;
@@ -321,7 +321,7 @@ PicSlider.prototype = {
         var nowPos = parseFloat(target.style.left ? target.style.left : 0);
         target.style.left = nowPos + this.getStep(nowPos, position) + "px";
 
-        var imgTarget = target.childNodesOfClass("image");
+        var imgTarget = childNodesOfClass(target, "image");
 
         if(Math.abs(nowPos - position) < 0.5){
             this.timer = 0;
