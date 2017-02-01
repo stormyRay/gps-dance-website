@@ -22,10 +22,6 @@ app.get('/getDancers.json', function(req, res){
 })
 // send all requests to index.html so browserHistory works
 app.get('/*', function (req, res) {
-	if(req.url == "/"){
-		res.redirect("/dancers");
-	}
-		console.log("req-url: " + req.url);
   res.sendFile(path.join(__dirname, '../dist', 'index.html'))
 })
 
