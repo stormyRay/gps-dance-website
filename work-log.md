@@ -76,3 +76,9 @@
 * Set up simple node server for several necessary web services.
 * Apply basic style to the page.
 * **First Milestone for G.P.S. web site building**
+
+********************************************************************
+
+2017-02-01
+* Change redirect logic from back end to front end (IndexRedirect in react-router).
+* Replace prototype function to function variables to avoid warnngs in React.
