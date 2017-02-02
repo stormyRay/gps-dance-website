@@ -1,8 +1,7 @@
 import React from "react";
-import PicSlider from "../components//picSlider";
-import { connect } from 'react-redux'
-import { getDancers } from '../actions/index'
-//import Dancers from '../components/Dancers'
+import picSpotLight from "../components/picSpotLight";
+import { connect } from "react-redux";
+import { getDancers } from "../actions/index";
 
 class Dancers extends React.Component{
 	constructor(props) {
@@ -16,7 +15,7 @@ class Dancers extends React.Component{
 
 	componentWillReceiveProps(nextProps) {
 		const {dancers} = nextProps;
-		var dancerSlider = new PicSlider("dancers_wrapper",{
+		var dancerSlider = new picSpotLight("dancers_wrapper",{
 			images: dancers,
 			normalWidth: 80,
 			focusIncrease: 7,

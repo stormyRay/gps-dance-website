@@ -15,41 +15,41 @@ var Class = {
     }
 }
 
-Object.prototype.merge = function(source){
+var merge = function(target, source){
     for(var property in source){
-        this[property] = source[property];
+        target[property] = source[property];
     }
 
-    return this;
+    return target;
 }
 
-Object.prototype.addEvent = function(type, func){
-    if (this.addEventListener) {
-        this.addEventListener(type, func, false);
-    } else if (this.attachEvent) {
-        this.attachEvent("on" + type, func);
+var addEvent = function(target, type, func){
+    if (target.addEventListener) {
+        target.addEventListener(type, func, false);
+    } else if (target.attachEvent) {
+        target.attachEvent("on" + type, func);
     } else {
-        this["on" + type] = func;
+        target["on" + type] = func;
     }
 
-    return this;
+    return target;
 }
 
-Object.prototype.appendNode = function(tagName, opt){
+var appendNode = function(target, tagName, opt){
     var node = document.createElement(tagName);
     Object.keys(opt).map(function(prop){
         if(typeof opt[prop] == "function"){
-            node.addEvent(prop, opt[prop]);
+            addEvent(node, prop, opt[prop]);
         } else{
         node.setAttribute(prop, opt[prop]);
         }
     });
-    this.appendChild(node);
+    target.appendChild(node);
     return node;
 }
 
-Object.prototype.childNodesOfClass = function(className){
-    var children = this.childNodes;
+var childNodesOfClass = function(target, className){
+    var children = target.childNodes;
     var results = [];
     for(var i = 0; i < children.length; i++){
         if(!children[i].classList){
@@ -80,8 +80,8 @@ var formStyle = function(opts){
     return str;
 }
 
-var PicSlider = Class.create();
-PicSlider.prototype = {
+var PicSpotLight = Class.create();
+PicSpotLight.prototype = {
     initialize: function(rootId, options){
         //Initialize the options
         this.viewportLeftOffset = 0;
@@ -91,14 +91,18 @@ PicSlider.prototype = {
         this.expandedIndex = -1;
         this.positions = {};
         this.basicOffsets = {};
+        this.showScroll = false;
 
         //temporary definition
         this.setOptions(options);
         var picOpts = options.images;
-        this.container = document.getElementById("rootId");
-        this.buildDOM(container);
+        this.container = document.getElementById(rootId);
+        this.buildDOM(this.container);
         //
         this.setBasicPosition(this.picContainer, this.picList);
+        addEvent(window, "resize", function(){
+        	this.setBasicPosition(this.picContainer, this.picList);
+        }.bind(this));
     },
     setOptions: function(opt){
         //default options
@@ -108,21 +112,21 @@ PicSlider.prototype = {
                 focusIncrease: 10,
                 maxWidth: 300,
                 interval: 20,
-                duration: 20
+                duration: 20,
+                srcPath: "img/",
+                introAttr: "information"
             };
-        this.options.merge(opt || {});
+        merge(this.options, opt || {});
     },
     buildDOM: function(container){
         //Need to add DOM build up logic here!!!
-
-        
-        this.viewport = container.appendNode("div", {
+        this.viewport = appendNode(container, "div", {
             id: "pic_slider_viewport",
             class: "slider-viewport"
         });
 
 
-        this.picContainer = this.viewport.appendNode("div",{
+        this.picContainer = appendNode(this.viewport, "div",{
             id: "pic_slider_container",
             class: "pic-container",
             mouseover: function(e) { 
@@ -138,7 +142,7 @@ PicSlider.prototype = {
         var images = this.options.images;
         this.picNumber = images.length;
         for(var i = 0; i < images.length; i ++){
-            var picWrapper = this.picContainer.appendNode("div", {
+            var picWrapper = appendNode(this.picContainer, "div", {
                 id: "pic_wrapper_" + images[i].name,
                 class: "pic-wrapper",
                 mouseover: function(index, e){
@@ -150,10 +154,10 @@ PicSlider.prototype = {
             });
 
             var offset = (this.options.normalWidth / 2 - images[i].center);
-            var image = picWrapper.appendNode("img", {
+            var image = appendNode(picWrapper, "img", {
                 id: "pic_" + images[i].name,
                 class: "image",
-                src: "img/"+images[i].img,
+                src: this.options.srcPath + images[i].img,
                 style: formStyle({
                     left: offset +"px"
                 })
@@ -163,13 +167,13 @@ PicSlider.prototype = {
             this.basicOffsets[image.id] = offset;
         }
 
-        this.picList = this.picContainer.childNodesOfClass("pic-wrapper");
+        this.picList = childNodesOfClass(this.picContainer, "pic-wrapper");
 
-        this.picIntro = this.picContainer.appendNode("div", {
+        this.picIntro = appendNode(this.picContainer, "div", {
             id: "pic_information",
             class: "pic-intro"
         });
-        this.previousHandler = this.picContainer.appendNode("div", {
+        this.previousHandler = appendNode(this.picContainer, "div", {
             id: "previous",
             class: "handling previous",
             mousedown: function(e){
@@ -185,7 +189,7 @@ PicSlider.prototype = {
         });
 
 
-        this.nextHandler = this.picContainer.appendNode("div", {
+        this.nextHandler = appendNode(this.picContainer, "div", {
             id: "next",
             class: "handling next",
             mousedown:  function(button, e){
@@ -199,6 +203,9 @@ PicSlider.prototype = {
                 this.movingViewport = false;
             }.bind(this)
         });
+
+        this.nextHandler.style.display = "none";        
+        this.previousHandler.style.display = "none";
 
         return container;
     },
@@ -218,9 +225,31 @@ PicSlider.prototype = {
             children[i].style.left = leftPosition+ "px";
             this.positions[children[i].id] = leftPosition;
             leftPosition += width;
+            var imageTarget = childNodesOfClass(children[i], "image");
+            var imageLeft = (width / 2 - this.options.images[i].center);
+            imageTarget.style.left = imageLeft+ "px";
+            this.positions[imageTarget.id] = imageLeft;
         }
 
-        this.picIntro.style.left = this.picNumber * this.options.normalWidth + "px";
+        var introLeft = Math.max(this.picNumber * this.options.normalWidth, container.clientWidth);
+        this.showScroll = (this.picNumber * this.options.normalWidth > container.clientWidth);
+        if(this.picNumber * this.options.normalWidth + this.viewportLeftOffset <= container.clientWidth){
+            this.viewportLeftOffset = 0;
+            this.picContainer.style.left = "0px";
+        }
+
+            this.nextHandler.style.right = 20 + this.viewportLeftOffset + "px";
+            this.previousHandler.style.left = 20 - this.viewportLeftOffset + "px";
+        this.picIntro.style.left = introLeft + "px";
+        this.positions[this.picIntro.id] = introLeft;
+    },
+    updateIntro: function(data){
+    	var introData = data[this.options.introAttr];
+    	if(introData){
+    		var introDOM = this.options.formIntro(introData);
+    		this.picIntro.innerHTML = "";
+    		this.picIntro.appendChild(introDOM);
+    	}
     },
     launchMove: function(index){
         if(this.expandedIndex >= 0)
@@ -242,11 +271,11 @@ PicSlider.prototype = {
                     width -= this.options.focusIncrease;
                 }
             }
-            var imageTarget = movingTarget.childNodesOfClass("image");
+            var imageTarget = childNodesOfClass(movingTarget, "image");
             this.positions[imageTarget.id] = (width / 2 - this.options.images[i].center)
             pos += width;
         }
-        this.positions["pic_information"] = this.picNumber * this.options.normalWidth;
+        this.positions["pic_information"] = Math.max(this.picNumber * this.options.normalWidth, this.container.clientWidth);
 
         this.moveGroup(this.positions, this.lastUpdate);
     },
@@ -269,7 +298,7 @@ PicSlider.prototype = {
                 pos = -1 * this.viewportLeftOffset;
             } else if (i == index){
                 pos = -1 * this.viewportLeftOffset;
-                var imageTargetId = movingTarget.childNodesOfClass("image").id;
+                var imageTargetId = childNodesOfClass(movingTarget, "image").id;
                 this.positions[imageTargetId] = 0;
             } else{
                 pos = -1 * this.viewportLeftOffset + containerWidth;
@@ -278,6 +307,7 @@ PicSlider.prototype = {
             //this.move(movingTarget, pos, this.lastUpdate);
         }
         this.positions["pic_information"] = -1 * this.viewportLeftOffset + containerWidth - this.picIntro.clientWidth;
+        this.updateIntro(this.options.images[index]);
         this.moveGroup(this.positions, this.lastUpdate);
         this.expandedIndex = index;
         this.showHideHandlers(false);
@@ -291,7 +321,7 @@ PicSlider.prototype = {
         var nowPos = parseFloat(target.style.left ? target.style.left : 0);
         target.style.left = nowPos + this.getStep(nowPos, position) + "px";
 
-        var imgTarget = target.childNodesOfClass("image");
+        var imgTarget = childNodesOfClass(target, "image");
 
         if(Math.abs(nowPos - position) < 0.5){
             this.timer = 0;
@@ -352,9 +382,11 @@ PicSlider.prototype = {
         }.bind(this), this.options.interval);
     },
     showHideHandlers: function(show){
-        this.nextHandler.style.display = show ? "block" : "none";
-        this.previousHandler.style.display =  show ? "block" : "none";
+    	if(this.showScroll){
+    	    this.nextHandler.style.display = show ? "block" : "none";
+            this.previousHandler.style.display =  show ? "block" : "none";
+        }
     }
 }
 
-var slider = new PicSlider("container", imagesOption);
+export default PicSpotLight;
