@@ -17,6 +17,7 @@ class Dancers extends React.Component{
 		const {dancers} = nextProps;
 		var dancerSlider = new picSpotLight("dancers_wrapper",{
 			images: dancers,
+			focusIncrease: 25,
 			normalWidth: 80,
 			focusIncrease: 7,
 			formIntro: function(data){
