@@ -1,11 +1,20 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import NavLink from "./NavLink";
-import Dropdown from "react-bootstrap/lib/Dropdown";
+import Overlay from "react-bootstrap/lib/Overlay";
+import Clearfix from "react-bootstrap/lib/Clearfix";
 import MenuItem from "react-bootstrap/lib/MenuItem";
 
 class NavBar extends React.Component{
 	constructor(props) {
 		super(props);
+		this.state = {
+			showDropdown: {
+				training: false
+			}
+		};
+		this.toggleDropdown = this.toggleDropdown.bind(this);
+		this.hideDropdown = this.hideDropdown.bind(this);
 	}
 
 	render(){
@@ -35,24 +44,29 @@ class NavBar extends React.Component{
 				//USE Overlay!!!!!
 				var dropdown = [];
 				var subList = tagList[i].subList;
-				var navItem = <NavLink key={"nav-" + tagList[i].value} to={"/" + tagList[i].value} bsRole="toggle">{tagList[i].text}</NavLink>;
+				var targetValue = tagList[i].value;
+				var navItem = <NavLink key={"nav-" + targetValue} 
+									onClick={(e) => this.toggleDropdown(e, targetValue)}
+									ref={"target-" + targetValue}>
+									{tagList[i].text}
+								</NavLink>;
 				for (var i = 0; i < subList.length; i++){
 					dropdown.push(
-						<MenuItem eventKey={tagList[i].value + "/" + subList[i].value} key={subList[i].value}>{subList[i].text}</MenuItem>);
+						<MenuItem eventKey={targetValue + "/" + subList[i].value} key={subList[i].value}>{subList[i].text}</MenuItem>);
 				}
 
 				NavList.push(
-					<Dropdown rootCloseEvent="click" id="training-dropdown">
+					<li className="dropdown-container" key={"container-" + targetValue}>
 						{navItem}
-						<div className="dropdown-menu" bsRole="menu">
-							<ul>
+						<Overlay show={this.state.showDropdown[targetValue]} rootClose container={this} onHide={(e) => this.toggleDropdown(e, targetValue)} key={"overlay-" + targetValue} placement="bottom" target={() => ReactDOM.findDOMNode(this.refs["target-" + targetValue])}>
+							<ul className="dropdown-menu open" key={"ul-" + targetValue}>
 								{dropdown}
 							</ul>
-						</div>
-					</Dropdown>);
+						</Overlay>
+					</li>);
 				
 			} else {
-				var navItem = <li key={tagList[i].value}><NavLink key={tagList[i].value} to={"/" + tagList[i].value}>{tagList[i].text}</NavLink></li>;
+				var navItem = <li key={"li-" + tagList[i].value}><NavLink key={"nav-" + tagList[i].value} to={"/" + tagList[i].value}>{tagList[i].text}</NavLink></li>;
 				NavList.push(navItem);
 			}
 		}
@@ -61,6 +75,22 @@ class NavBar extends React.Component{
 				{NavList}
 			</ul>
 		)
+	}
+
+	toggleDropdown(e, linkValue){
+		var dropdownState = Object.assign({}, this.state.showDropdown);
+		dropdownState[linkValue] = !dropdownState[linkValue];
+		this.setState({
+			showDropdown: dropdownState
+		});
+	}
+
+	hideDropdown(e, linkValue){
+		var dropdownState = Object.assign({}, this.state.showDropdown);
+		dropdownState[linkValue] = false;
+		this.setState({
+			showDropdown: dropdownState
+		});
 	}
 }
 
