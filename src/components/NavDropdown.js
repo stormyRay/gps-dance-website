@@ -21,12 +21,12 @@ class NavDropdown extends React.Component{
 		var navItem = <NavLink onClick={this.toggleDropdown} ref={"target-" + targetValue}>{tagListItem.text}</NavLink>;
   		for (var i = 0; i < subList.length; i++){
   			dropdown.push(
-  				<MenuItem eventKey={targetValue + "/" + subList[i].value} key={subList[i].value}>{subList[i].text}</MenuItem>);
+  				<li key={"li-" + subList[i].value}><NavLink to={"/" + targetValue + "/" + subList[i].value} key={subList[i].value}>{subList[i].text}</NavLink></li>);
   		}
     	return (
     		<li className="dropdown-container" key={"container-" + targetValue}>
     			{navItem}
-    			<Overlay show={this.state.showDropdown} rootClose container={this} onHide={this.hideDropdown} placement="bottom" target={() => ReactDOM.findDOMNode(this.refs["target-" + targetValue])}>
+    			<Overlay bsClass="sub-nav-dropdown" show={this.state.showDropdown} rootClose container={this} onHide={this.hideDropdown} placement="bottom" target={() => ReactDOM.findDOMNode(this.refs["target-" + targetValue])}>
     				<ul className="dropdown-menu open">
     					{dropdown}
     				</ul>

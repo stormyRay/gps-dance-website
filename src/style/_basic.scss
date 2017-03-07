@@ -27,11 +27,45 @@ body {
 			font-size: 14px;
 			font-family: Arial;
 			text-decoration: none;
+			cursor: pointer;
 
 			&:hover,
 			&.active{
 				font-weight: 600;
 				font-size: 16px;
+			}
+		}
+	}
+
+	.dropdown-container{
+		position: relative;
+
+		.dropdown-menu.fade.open{
+			display: block;
+			//transform: translate(-50%, 0);
+			min-width: 80px;
+			border: none;
+    		background-color: transparent;
+    		box-shadow: 0 0;
+    		left: 50%!important;
+    		transform: translate(-50%,0);
+
+
+			li{
+				display: block;
+				text-align: center;
+				width: auto;
+				background-color: rgba(0,0,0,0.5);
+    			margin-top: 2px;
+    			border-bottom: 1px solid #333333;
+				a{
+					padding: 0;
+					color: #EFEFEF;
+
+					&:hover{
+						background-color: transparent;
+					}
+				}
 			}
 		}
 	}
