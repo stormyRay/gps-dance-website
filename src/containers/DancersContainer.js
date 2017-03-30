@@ -22,7 +22,27 @@ class Dancers extends React.Component{
 			focusIncrease: 7,
 			formIntro: function(data){
 				var _div = document.createElement("div");
-				_div.innerHTML = data.name + data.danceType;
+				_div.setAttribute("class", "info-wrapper");
+				//_div.innerHTML = data.name + data.danceType;
+				var resumesHTML =``;
+				if(data.resumes){
+					for(var i = 0; i < data.resumes.length; i ++){
+						resumesHTML += `<div class="resume-item">${data.resumes[i]}</div>`
+					} 
+				}
+				_div.innerHTML = `
+					<div class="description-wrapper">
+						<div class="name-wrapper">
+							<div class="name">${data.name}</div>
+							<div class="english-name">${data.eName}</div>.
+						</div>
+						<div class="desc-line">
+							<div class="desc-label">擅长舞蹈风格</div>
+							<div class="desc-content">${data.danceType}</div>
+						</div>
+						<div class="desc_label resume_label">个人履历</div>
+						<div class="resume-area">${resumesHTML}</div>
+					</div>`;
 				return _div;
 			}
 		})

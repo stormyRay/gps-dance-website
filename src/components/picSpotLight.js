@@ -110,6 +110,7 @@ PicSpotLight.prototype = {
             this.options = {
                 normalWidth: 75,
                 focusIncrease: 10,
+                infoLeft: 0.4,
                 maxWidth: 300,
                 interval: 20,
                 duration: 20,
@@ -306,7 +307,8 @@ PicSpotLight.prototype = {
             this.positions[movingTarget.id] = pos;
             //this.move(movingTarget, pos, this.lastUpdate);
         }
-        this.positions["pic_information"] = -1 * this.viewportLeftOffset + containerWidth - this.picIntro.clientWidth;
+        //this.positions["pic_information"] = -1 * this.viewportLeftOffset + containerWidth - this.picIntro.clientWidth;
+        this.positions["pic_information"] = -1 * this.viewportLeftOffset + this.options.infoLeft * containerWidth;
         this.updateIntro(this.options.images[index]);
         this.moveGroup(this.positions, this.lastUpdate);
         this.expandedIndex = index;

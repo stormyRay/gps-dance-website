@@ -62,7 +62,9 @@ body {
 					padding: 0;
 					color: #EFEFEF;
 
-					&:hover{
+					&:hover,
+					&:focus,
+					&:active{
 						background-color: transparent;
 					}
 				}
