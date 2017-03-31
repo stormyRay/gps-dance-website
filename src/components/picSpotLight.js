@@ -111,6 +111,7 @@ PicSpotLight.prototype = {
                 normalWidth: 75,
                 focusIncrease: 10,
                 infoLeft: 0.4,
+                infoMinLeft: 300,
                 maxWidth: 300,
                 interval: 20,
                 duration: 20,
@@ -292,13 +293,18 @@ PicSpotLight.prototype = {
         }
         this.lastUpdate = 0 + this.timer;
         var containerWidth = parseFloat(this.picContainer.clientWidth);
+
+        var infoLeft = Math.max(this.options.infoLeft * containerWidth, this.options.infoMinLeft);
+        var targetLeft = (infoLeft - this.options.infoMinLeft) / 2;
+        this.positions["pic_information"] = -1 * this.viewportLeftOffset + infoLeft;
+
         for(var i = 0; i < this.picNumber; i++){
             var movingTarget = this.picList[i];
             var pos;
             if(i < index){
-                pos = -1 * this.viewportLeftOffset;
+                pos = -1 * this.viewportLeftOffset - movingTarget.clientWidth;
             } else if (i == index){
-                pos = -1 * this.viewportLeftOffset;
+                pos = -1 * this.viewportLeftOffset + targetLeft;
                 var imageTargetId = childNodesOfClass(movingTarget, "image").id;
                 this.positions[imageTargetId] = 0;
             } else{
@@ -308,7 +314,7 @@ PicSpotLight.prototype = {
             //this.move(movingTarget, pos, this.lastUpdate);
         }
         //this.positions["pic_information"] = -1 * this.viewportLeftOffset + containerWidth - this.picIntro.clientWidth;
-        this.positions["pic_information"] = -1 * this.viewportLeftOffset + this.options.infoLeft * containerWidth;
+
         this.updateIntro(this.options.images[index]);
         this.moveGroup(this.positions, this.lastUpdate);
         this.expandedIndex = index;
