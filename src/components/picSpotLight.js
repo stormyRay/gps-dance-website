@@ -48,6 +48,18 @@ var appendNode = function(target, tagName, opt){
     return node;
 }
 
+var createNode = function(tagName, opt){
+    var node = document.createElement(tagName);
+    Object.keys(opt).map(function(prop){
+        if(typeof opt[prop] == "function"){
+            addEvent(node, prop, opt[prop]);
+        } else{
+        node.setAttribute(prop, opt[prop]);
+        }
+    });
+    return node;
+}
+
 var childNodesOfClass = function(target, className){
     var children = target.childNodes;
     var results = [];
@@ -92,6 +104,7 @@ PicSpotLight.prototype = {
         this.positions = {};
         this.basicOffsets = {};
         this.showScroll = false;
+        this.loadedImageNumber = 0;
 
         //temporary definition
         this.setOptions(options);
@@ -99,7 +112,7 @@ PicSpotLight.prototype = {
         this.container = document.getElementById(rootId);
         this.buildDOM(this.container);
         //
-        this.setBasicPosition(this.picContainer, this.picList);
+        //this.setBasicPosition(this.picContainer, this.picList);
         addEvent(window, "resize", function(){
         	this.setBasicPosition(this.picContainer, this.picList);
         }.bind(this));
@@ -144,7 +157,7 @@ PicSpotLight.prototype = {
         var images = this.options.images;
         this.picNumber = images.length;
         for(var i = 0; i < images.length; i ++){
-            var picWrapper = appendNode(this.picContainer, "div", {
+            var picWrapper = createNode("div", {
                 id: "pic_wrapper_" + images[i].name,
                 class: "pic-wrapper",
                 mouseover: function(index, e){
@@ -164,17 +177,29 @@ PicSpotLight.prototype = {
                     left: offset +"px"
                 })
             });
+            var wrappers = [];
+            addEvent(image, "load", function(wrapper, index){
+                wrappers[index] = wrapper;
+                this.loadedImageNumber ++;
+                if(this.loadedImageNumber == images.length){
+                    for(var k = 0; k < images.length; k++){
+                        this.picContainer.appendChild(wrappers[k]);
+                    }
+                    this.picList = childNodesOfClass(this.picContainer, "pic-wrapper");
+                    this.picIntro = appendNode(this.picContainer, "div", {
+                        id: "pic_information",
+                        class: "pic-intro"
+                    });
+
+                    this.setBasicPosition(this.picContainer, this.picList);
+                }
+            }.bind(this, picWrapper, i));
 
             this.positions[image.id] = offset;
             this.basicOffsets[image.id] = offset;
         }
 
-        this.picList = childNodesOfClass(this.picContainer, "pic-wrapper");
 
-        this.picIntro = appendNode(this.picContainer, "div", {
-            id: "pic_information",
-            class: "pic-intro"
-        });
         this.previousHandler = appendNode(this.picContainer, "div", {
             id: "previous",
             class: "handling previous",
